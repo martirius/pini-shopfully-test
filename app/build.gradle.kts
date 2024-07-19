@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.jetbrains.kotlin.serialization.plugin)
+    kotlin("kapt")
+    alias(libs.plugins.google.hilt)
 }
 
 android {
@@ -72,4 +74,10 @@ dependencies {
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.arrow.core)
+    implementation(libs.google.hilt.core)
+    kapt(libs.google.hilt.compiler)
+}
+
+kapt {
+    correctErrorTypes = true
 }
