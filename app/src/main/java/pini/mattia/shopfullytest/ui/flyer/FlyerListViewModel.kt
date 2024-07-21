@@ -54,10 +54,40 @@ class FlyerListViewModel @Inject constructor(
         }
     }
 
+    fun flyerSelected(flyer: Flyer) {
+        val currentState = viewState.value
+        if (currentState is FlyerListState.Content) {
+            _viewState.value = currentState.copy(selectedFlyer = flyer)
+        }
+    }
+
+    fun flyerDetailDismissed() {
+        val currentState = viewState.value
+        if (currentState is FlyerListState.Content && currentState.selectedFlyer != null) {
+            val readFlyer = currentState.selectedFlyer.copy(isAlreadySeen = true)
+            val updatedFlyers = replaceFlyer(currentState.flyers, readFlyer)
+            _viewState.value = currentState.copy(selectedFlyer = null)
+            _allFlyers.value = updatedFlyers
+        }
+    }
+
+    private fun replaceFlyer(list: List<Flyer>, newItem: Flyer): List<Flyer> {
+        val mutableList = list.toMutableList()
+        val index = list.indexOfFirst { it.id == newItem.id }
+        if (index != -1) {
+            mutableList[index] = newItem
+        }
+        return mutableList
+    }
 }
 
 sealed interface FlyerListState {
     data object Loading : FlyerListState
-    data class Content(val flyers: List<Flyer>, val isFilterEnabled: Boolean) : FlyerListState
+    data class Content(
+        val flyers: List<Flyer>,
+        val isFilterEnabled: Boolean,
+        val selectedFlyer: Flyer? = null
+    ) : FlyerListState
+
     data class Error(val error: FlyerError) : FlyerListState
 }

@@ -20,9 +20,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -42,12 +44,19 @@ import pini.mattia.shopfullytest.domain.flyer.Flyer
 @Composable
 fun FlyerListPage(flyerListViewModel: FlyerListViewModel = viewModel()) {
     val state = flyerListViewModel.viewState.collectAsState().value
-    FlyerListPageComposable(state = state)
+    FlyerListPageComposable(state = state, {
+        flyerListViewModel.flyerSelected(it)
+    }, flyerListViewModel::flyerDetailDismissed)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun FlyerListPageComposable(state: FlyerListState) {
+private fun FlyerListPageComposable(
+    state: FlyerListState,
+    onSelectedFlyer: (flyer: Flyer) -> Unit,
+    onDetailDismissed: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState()
     Scaffold(modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(title = { Text(text = stringResource(id = R.string.flyer_page_title)) })
@@ -84,8 +93,25 @@ private fun FlyerListPageComposable(state: FlyerListState) {
                     state.flyers.forEach { flyer ->
                         item(
                             span = { if (flyer.isXL) GridItemSpan(maxLineSpan) else GridItemSpan(1) }) {
-                            FlyerItem(flyer = flyer)
+                            FlyerItem(flyer = flyer, onSelectedFlyer)
                         }
+                    }
+
+                }
+                if (state.selectedFlyer != null) {
+                    ModalBottomSheet(
+                        onDismissRequest = onDetailDismissed,
+                        sheetState = sheetState
+                    ) {
+                        Text(text = state.selectedFlyer.title)
+                        GlideImage(
+                            modifier = Modifier
+                                .aspectRatio(1f)
+                                .fillMaxSize(),
+                            model = state.selectedFlyer.flyerBackground,
+                            contentDescription = null,
+                            contentScale = ContentScale.FillBounds
+                        )
                     }
                 }
             }
