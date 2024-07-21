@@ -71,6 +71,10 @@ class FlyerListViewModel @Inject constructor(
         }
     }
 
+    fun filterSwitched(status: Boolean) {
+        _showOnlySeen.value = status
+    }
+
     private fun replaceFlyer(list: List<Flyer>, newItem: Flyer): List<Flyer> {
         val mutableList = list.toMutableList()
         val index = list.indexOfFirst { it.id == newItem.id }
