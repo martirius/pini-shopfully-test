@@ -81,6 +81,10 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.jetbrains.kotlin.coroutine.test)
     testImplementation(libs.ktor.client.mock)
+    implementation(libs.glide.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.compose.shimmer)
+
 }
 
 kapt {
