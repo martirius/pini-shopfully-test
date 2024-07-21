@@ -65,7 +65,7 @@ class FlyerListViewModel @Inject constructor(
         val currentState = viewState.value
         if (currentState is FlyerListState.Content && currentState.selectedFlyer != null) {
             val readFlyer = currentState.selectedFlyer.copy(isAlreadySeen = true)
-            val updatedFlyers = replaceFlyer(currentState.flyers, readFlyer)
+            val updatedFlyers = replaceFlyer(_allFlyers.value, readFlyer)
             _viewState.value = currentState.copy(selectedFlyer = null)
             _allFlyers.value = updatedFlyers
         }
