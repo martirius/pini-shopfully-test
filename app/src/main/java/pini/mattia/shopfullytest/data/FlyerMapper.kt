@@ -1,8 +1,9 @@
 package pini.mattia.shopfullytest.data
 
 import pini.mattia.shopfullytest.domain.flyer.Flyer
+import javax.inject.Inject
 
-class FlyerMapper {
+class FlyerMapper @Inject constructor() {
     fun map(flyerDTO: FlyerDTO): Flyer = with(flyerDTO) {
         Flyer(
             id = id,

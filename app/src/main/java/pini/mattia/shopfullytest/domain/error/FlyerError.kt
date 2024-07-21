@@ -3,7 +3,10 @@ package pini.mattia.shopfullytest.domain.error
 sealed interface FlyerError {
     data object NoFlyer: FlyerError
 
-    class FlyerGetError(val error: NetworkError): FlyerError
+    data class ApiError(val error: NetworkError): FlyerError
+
+    data class SerializationError(val message: String): FlyerError
+
 }
 
 sealed interface NetworkError {
@@ -11,5 +14,6 @@ sealed interface NetworkError {
 
     data object ConnectionTimeout: NetworkError
 
-    data object ServerDown: NetworkError
+    data object ServerError: NetworkError
+
 }

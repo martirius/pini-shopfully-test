@@ -10,7 +10,9 @@ activityCompose = "1.9.0"
 composeBom = "2024.06.00"
 ktor = "2.3.12"
 arrow = "1.1.2"
-hilt = "2.44"
+hilt = "2.51.1"
+mockito-kotlin = "5.4.0"
+coroutine-test = "1.8.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -29,14 +31,19 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
-jetbrains-kotlin-serialization-libs = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.5.1"}
-arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow"}
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
+jetbrains-kotlin-serialization-libs = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.5.1" }
+arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
 google-hilt-core = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 google-hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
+jetbrains-kotlin-coroutine-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutine-test" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-jetbrains-kotlin-serialization-plugin = { id = "org.jetbrains.kotlin.plugin.serialization", version = "2.0.0"}
-google-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt"}
+jetbrains-kotlin-serialization-plugin = { id = "org.jetbrains.kotlin.plugin.serialization", version = "2.0.0" }
+google-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 

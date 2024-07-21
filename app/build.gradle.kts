@@ -73,9 +73,14 @@ dependencies {
     implementation(libs.jetbrains.kotlin.serialization.libs)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.client.serialization.json)
     implementation(libs.arrow.core)
     implementation(libs.google.hilt.core)
     kapt(libs.google.hilt.compiler)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.jetbrains.kotlin.coroutine.test)
+    testImplementation(libs.ktor.client.mock)
 }
 
 kapt {
