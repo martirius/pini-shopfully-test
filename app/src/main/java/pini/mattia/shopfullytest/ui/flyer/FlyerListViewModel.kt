@@ -9,15 +9,18 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import pini.mattia.shopfullytest.domain.analytics.StreamFully
 import pini.mattia.shopfullytest.domain.error.FlyerError
 import pini.mattia.shopfullytest.domain.flyer.Flyer
 import pini.mattia.shopfullytest.domain.flyer.UseCaseGetFlyers
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
 class FlyerListViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val useCaseGetFlyers: UseCaseGetFlyers
+    private val useCaseGetFlyers: UseCaseGetFlyers,
+    private val streamFully: StreamFully
 ) : ViewModel() {
 
     private val _showOnlySeen = MutableStateFlow(false)
@@ -26,6 +29,8 @@ class FlyerListViewModel @Inject constructor(
     val viewState: StateFlow<FlyerListState> = _viewState
 
     private val _allFlyers: MutableStateFlow<List<Flyer>> = MutableStateFlow(emptyList())
+
+    private var flyerOpenedTime: Long = 0L
 
     init {
         viewModelScope.launch {
@@ -57,17 +62,36 @@ class FlyerListViewModel @Inject constructor(
     fun flyerSelected(flyer: Flyer) {
         val currentState = viewState.value
         if (currentState is FlyerListState.Content) {
+            flyerOpenedTime = Date().time
             _viewState.value = currentState.copy(selectedFlyer = flyer)
+            val streamFullyEvent = StreamFullyEvents.FlyerOpen(
+                flyer.retailerId,
+                flyer.id,
+                flyer.title,
+                _allFlyers.value.indexOfFirst { it.id == flyer.id },
+                !flyer.isAlreadySeen
+            )
+            streamFully.process(streamFullyEvent)
         }
     }
 
     fun flyerDetailDismissed() {
         val currentState = viewState.value
         if (currentState is FlyerListState.Content && currentState.selectedFlyer != null) {
+            val sessionDuration = (Date().time - flyerOpenedTime).toInt()
+            val flyerSessionEvent = StreamFullyEvents.FlyerSession(
+                currentState.selectedFlyer.id,
+                sessionDuration,
+                !currentState.selectedFlyer.isAlreadySeen
+            )
+
             val readFlyer = currentState.selectedFlyer.copy(isAlreadySeen = true)
             val updatedFlyers = replaceFlyer(_allFlyers.value, readFlyer)
             _viewState.value = currentState.copy(selectedFlyer = null)
             _allFlyers.value = updatedFlyers
+
+            streamFully.process(flyerSessionEvent)
+
         }
     }
 
