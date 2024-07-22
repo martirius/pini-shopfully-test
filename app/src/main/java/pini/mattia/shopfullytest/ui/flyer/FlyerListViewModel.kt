@@ -50,6 +50,7 @@ class FlyerListViewModel @Inject constructor(
 
     fun loadFlyers() {
         viewModelScope.launch {
+            _viewState.emit(FlyerListState.Loading)
             useCaseGetFlyers.execute().fold(
                 ifLeft = { error ->
                     _viewState.emit(FlyerListState.Error(error))

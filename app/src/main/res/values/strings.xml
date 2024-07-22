@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Pini ShopFully Test</string>
     <string name="flyer_page_title">Volantini</string>
+    <string name="flyers_load_error">Opss. Qualcosa e\' andato storto..</string>
+    <string name="retry">Riprova</string>
 </resources>

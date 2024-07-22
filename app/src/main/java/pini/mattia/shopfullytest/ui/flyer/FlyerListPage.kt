@@ -8,6 +8,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,9 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
@@ -42,6 +46,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -64,7 +69,8 @@ fun FlyerListPage(flyerListViewModel: FlyerListViewModel = viewModel()) {
                 percentage,
                 flyerId
             )
-        }
+        },
+        flyerListViewModel::loadFlyers
     )
 }
 
@@ -75,7 +81,8 @@ private fun FlyerListPageComposable(
     onSelectedFlyer: (flyer: Flyer) -> Unit,
     onDetailDismissed: () -> Unit,
     onSwitchToggled: (status: Boolean) -> Unit,
-    onImpression: (duration: Int, percentage: Float, flyerId: Int) -> Unit
+    onImpression: (duration: Int, percentage: Float, flyerId: Int) -> Unit,
+    reloadFlyers: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
     val isFilterEnabled = remember {
@@ -162,13 +169,23 @@ private fun FlyerListPageComposable(
             }
 
             is FlyerListState.Error -> {
-
+                Box(modifier = Modifier
+                    .padding(it)
+                    .fillMaxSize()) {
+                    Column(modifier = Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = stringResource(id = R.string.flyers_load_error), fontSize = 22.sp, color = Color.Red)
+                        Button(onClick = reloadFlyers, colors = ButtonDefaults.buttonColors().copy(containerColor = Color.Red)) {
+                            Text(text = stringResource(id = R.string.retry), color = Color.White)
+                        }
+                    }
+                }
             }
         }
 
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun FlyerItem(
     flyer: Flyer,
