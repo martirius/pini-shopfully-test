@@ -16,6 +16,8 @@ import pini.mattia.shopfullytest.domain.flyer.UseCaseGetFlyers
 import java.util.Date
 import javax.inject.Inject
 
+private const val IMPRESSION_DURATION_THRESHOLD = 1000
+
 @HiltViewModel
 class FlyerListViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
@@ -97,6 +99,14 @@ class FlyerListViewModel @Inject constructor(
 
     fun filterSwitched(status: Boolean) {
         _showOnlySeen.value = status
+    }
+
+    fun onImpression(duration: Int, percentage: Float, flyerId: Int) {
+        if(duration > IMPRESSION_DURATION_THRESHOLD) {
+            val impressionEvent =
+                StreamFullyEvents.Viewability(flyerId, duration, (percentage * 100).toInt())
+            streamFully.process(impressionEvent)
+        }
     }
 
     private fun replaceFlyer(list: List<Flyer>, newItem: Flyer): List<Flyer> {

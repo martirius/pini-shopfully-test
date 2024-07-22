@@ -37,4 +37,18 @@ sealed interface StreamFullyEvents : StreamFullyEvent {
             get() = buildAttributes()
 
     }
+
+    data class Viewability(val flyerId: Int, val duration: Int, val percentage: Int): StreamFullyEvents {
+        override fun buildAttributes(): Map<String, Any> = mapOf(
+            "flyer_id" to flyerId,
+            "duration" to duration,
+            "percentage" to percentage
+        )
+
+        override val eventType: String
+            get() = "viewability"
+        override val attributes: Map<String, Any>
+            get() = buildAttributes()
+
+    }
 }

@@ -48,6 +48,8 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.valentinilk.shimmer.shimmer
 import pini.mattia.shopfullytest.R
 import pini.mattia.shopfullytest.domain.flyer.Flyer
+import pini.mattia.shopfullytest.ui.visibilitytracker.VisibilityTracker
+import java.util.Date
 
 @Composable
 fun FlyerListPage(flyerListViewModel: FlyerListViewModel = viewModel()) {
@@ -55,17 +57,25 @@ fun FlyerListPage(flyerListViewModel: FlyerListViewModel = viewModel()) {
     FlyerListPageComposable(state = state, {
         flyerListViewModel.flyerSelected(it)
     }, flyerListViewModel::flyerDetailDismissed,
-        { flyerListViewModel.filterSwitched(it) }
+        { flyerListViewModel.filterSwitched(it) },
+        { duration, percentage, flyerId ->
+            flyerListViewModel.onImpression(
+                duration,
+                percentage,
+                flyerId
+            )
+        }
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 private fun FlyerListPageComposable(
     state: FlyerListState,
     onSelectedFlyer: (flyer: Flyer) -> Unit,
     onDetailDismissed: () -> Unit,
-    onSwitchToggled: (status: Boolean) -> Unit
+    onSwitchToggled: (status: Boolean) -> Unit,
+    onImpression: (duration: Int, percentage: Float, flyerId: Int) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
     val isFilterEnabled = remember {
@@ -123,7 +133,7 @@ private fun FlyerListPageComposable(
                     state.flyers.forEach { flyer ->
                         item(
                             span = { if (flyer.isXL) GridItemSpan(maxLineSpan) else GridItemSpan(1) }) {
-                            FlyerItem(flyer = flyer, onSelectedFlyer)
+                            FlyerItem(flyer = flyer, onSelectedFlyer, onImpression)
                         }
                     }
 
@@ -160,7 +170,11 @@ private fun FlyerListPageComposable(
 }
 
 @Composable
-fun FlyerItem(flyer: Flyer, onFlyerClicked: (flyer: Flyer) -> Unit = {}) {
+fun FlyerItem(
+    flyer: Flyer,
+    onFlyerClicked: (flyer: Flyer) -> Unit,
+    onImpression: (duration: Int, percentage: Float, flyerId: Int) -> Unit
+) {
     Box(
         Modifier
             .border(
@@ -175,14 +189,37 @@ fun FlyerItem(flyer: Flyer, onFlyerClicked: (flyer: Flyer) -> Unit = {}) {
             }
     ) {
 
-        GlideImage(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxSize(),
-            model = flyer.flyerBackground,
-            contentDescription = null,
-            contentScale = ContentScale.FillBounds
-        )
+        var appearedTime = remember {
+            0L
+        }
+        var becameVisible = remember {
+            false
+        }
+        var visibleRatio = remember {
+            0.0f
+        }
+        VisibilityTracker(onVisibilityChanged = { visible ->
+            if (visible) {
+                becameVisible = true
+                appearedTime = Date().time
+            }
+            if (!visible && becameVisible) {
+                val impressionDuration = Date().time - appearedTime
+                onImpression(impressionDuration.toInt(), visibleRatio, flyer.id)
+                becameVisible = false
+            }
+        }, threshold = 0.5f, visibleRatioCallback = { ratio ->
+            visibleRatio = ratio
+        }) {
+            GlideImage(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxSize(),
+                model = flyer.flyerBackground,
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds
+            )
+        }
 
 
         Box(
